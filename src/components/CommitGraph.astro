@@ -1,0 +1,385 @@
+---
+type Point = {
+  date: string;
+  commits: number;
+  message: string;
+  sha: string;
+};
+
+interface Props {
+  graphId: string;
+  repo: string;
+  points: readonly Point[];
+}
+
+const { graphId, repo, points } = Astro.props;
+
+const width = 560;
+const height = 160;
+const padding = { top: 60, right: 18, bottom: 26, left: 8 };
+const innerWidth = width - padding.left - padding.right;
+const innerHeight = height - padding.top - padding.bottom;
+
+const parsed = points.map((point) => ({
+  ...point,
+  ts: new Date(point.date).getTime(),
+}));
+
+const minTs = Math.min(...parsed.map((point) => point.ts));
+const maxTs = Math.max(...parsed.map((point) => point.ts));
+const maxCommits = Math.max(...parsed.map((point) => point.commits));
+const spanTs = Math.max(maxTs - minTs, 1);
+
+const positioned = parsed.map((point) => {
+  const x = padding.left + ((point.ts - minTs) / spanTs) * innerWidth;
+  const y =
+    padding.top + innerHeight - ((point.commits - 1) / Math.max(maxCommits - 1, 1)) * innerHeight;
+
+  return {
+    ...point,
+    x: Number(x.toFixed(2)),
+    y: Number(y.toFixed(2)),
+  };
+});
+
+function buildSmoothPath(
+  pts: typeof positioned,
+  closeArea = false,
+) {
+  if (pts.length === 0) return "";
+  if (pts.length === 1) {
+    const point = pts[0];
+    const base = `M ${point.x} ${point.y}`;
+    return closeArea
+      ? `${base} L ${point.x} ${height - padding.bottom} L ${point.x} ${height - padding.bottom} Z`
+      : base;
+  }
+
+  let path = `M ${pts[0].x} ${pts[0].y}`;
+
+  for (let index = 1; index < pts.length; index += 1) {
+    const previous = pts[index - 1];
+    const current = pts[index];
+    const midpointX = Number(((previous.x + current.x) / 2).toFixed(2));
+    const midpointY = Number(((previous.y + current.y) / 2).toFixed(2));
+    path += ` Q ${previous.x} ${previous.y} ${midpointX} ${midpointY}`;
+  }
+
+  const last = pts[pts.length - 1];
+  path += ` T ${last.x} ${last.y}`;
+
+  if (closeArea) {
+    path += ` L ${last.x} ${height - padding.bottom} L ${pts[0].x} ${height - padding.bottom} Z`;
+  }
+
+  return path;
+}
+
+const linePath = buildSmoothPath(positioned);
+const areaPath = buildSmoothPath(positioned, true);
+const startLabel = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  year: "numeric",
+}).format(new Date(minTs));
+const endLabel = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  year: "numeric",
+}).format(new Date(maxTs));
+const originLabel = new Intl.DateTimeFormat("en-US", {
+  month: "long",
+  year: "numeric",
+}).format(new Date(minTs));
+
+function relativeLabel(date: Date) {
+  const now = new Date();
+  const diffMs = Math.max(now.getTime() - date.getTime(), 0);
+  const dayMs = 1000 * 60 * 60 * 24;
+  const days = Math.floor(diffMs / dayMs);
+
+  if (days === 0) return "Today";
+  if (days === 1) return "1 day ago";
+  if (days < 7) return `${days} days ago`;
+
+  const weeks = Math.floor(days / 7);
+  if (weeks === 1) return "This week";
+  if (weeks < 5) return `${weeks} weeks ago`;
+
+  const months =
+    (now.getFullYear() - date.getFullYear()) * 12 +
+    (now.getMonth() - date.getMonth());
+
+  if (months <= 1) return "This month";
+  if (months < 12) return `${months} months ago`;
+
+  const years = Math.floor(months / 12);
+  if (years === 1) return "1 year ago";
+  return `${years} years ago`;
+}
+
+const freshnessLabel = relativeLabel(new Date(maxTs));
+const payload = JSON.stringify(positioned);
+---
+
+<div
+  class="commit-graph"
+  data-commit-graph
+  data-points={payload}
+  data-graph-id={graphId}
+>
+  <div class="commit-graph__frame">
+    <div class="commit-graph__meta">
+      <p class="commit-graph__repo">{repo}</p>
+      <p class="commit-graph__subtle">Origin: {originLabel}</p>
+      <p class="commit-graph__subtle">Last Updated: {freshnessLabel}</p>
+    </div>
+
+    <svg
+      class="commit-graph__svg"
+      viewBox={`0 0 ${width} ${height}`}
+      aria-label="Commit activity graph"
+      role="img"
+    >
+      <defs>
+        <linearGradient id={`stroke-${graphId}`} x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#a78bfa"></stop>
+          <stop offset="45%" stop-color="#7dd3fc"></stop>
+          <stop offset="100%" stop-color="#34d399"></stop>
+        </linearGradient>
+        <linearGradient id={`fill-${graphId}`} x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="rgba(125, 211, 252, 0.28)"></stop>
+          <stop offset="100%" stop-color="rgba(125, 211, 252, 0)"></stop>
+        </linearGradient>
+      </defs>
+
+      <path d={areaPath} fill={`url(#fill-${graphId})`}></path>
+      <path
+        d={linePath}
+        fill="none"
+        stroke={`url(#stroke-${graphId})`}
+        stroke-width="3"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+      <line class="commit-graph__focus-line" x1="0" x2="0" y1={padding.top} y2={height - padding.bottom}></line>
+      <circle class="commit-graph__focus-dot" cx="0" cy="0" r="5"></circle>
+      <rect
+        class="commit-graph__hitbox"
+        x={padding.left}
+        y={padding.top}
+        width={innerWidth}
+        height={innerHeight}
+      ></rect>
+    </svg>
+
+    <div class="commit-graph__tooltip" hidden>
+      <p class="commit-graph__tooltip-date"></p>
+      <p class="commit-graph__tooltip-message"></p>
+      <p class="commit-graph__tooltip-meta"></p>
+    </div>
+  </div>
+
+  <div class="commit-graph__legend">
+    <span>{startLabel}</span>
+    <span>{maxCommits} commits</span>
+    <span>{endLabel}</span>
+  </div>
+</div>
+
+<script>
+  (() => {
+    const graphs = document.querySelectorAll("[data-commit-graph]");
+
+    graphs.forEach((graph) => {
+      if (graph.dataset.ready === "true") return;
+      graph.dataset.ready = "true";
+
+      const points = JSON.parse(graph.dataset.points || "[]");
+      if (!points.length) return;
+
+      const svg = graph.querySelector(".commit-graph__svg");
+      const hitbox = graph.querySelector(".commit-graph__hitbox");
+      const tooltip = graph.querySelector(".commit-graph__tooltip");
+      const focusLine = graph.querySelector(".commit-graph__focus-line");
+      const focusDot = graph.querySelector(".commit-graph__focus-dot");
+      const dateNode = graph.querySelector(".commit-graph__tooltip-date");
+      const messageNode = graph.querySelector(".commit-graph__tooltip-message");
+      const metaNode = graph.querySelector(".commit-graph__tooltip-meta");
+
+      if (!svg || !hitbox || !tooltip || !focusLine || !focusDot || !dateNode || !messageNode || !metaNode) {
+        return;
+      }
+
+      const frame = graph.querySelector(".commit-graph__frame");
+      const formatDate = new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
+
+      let rafId = 0;
+
+      const renderPoint = (point) => {
+        tooltip.hidden = false;
+        dateNode.textContent = formatDate.format(new Date(point.date));
+        messageNode.textContent = point.message;
+        metaNode.textContent = `Commit #${point.commits} • ${point.sha}`;
+
+        focusLine.setAttribute("x1", point.x);
+        focusLine.setAttribute("x2", point.x);
+        focusDot.setAttribute("cx", point.x);
+        focusDot.setAttribute("cy", point.y);
+        focusLine.classList.add("is-visible");
+        focusDot.classList.add("is-visible");
+
+        const frameRect = frame.getBoundingClientRect();
+        const svgRect = svg.getBoundingClientRect();
+        const tooltipWidth = tooltip.offsetWidth || 220;
+        const left = ((point.x / 560) * svgRect.width);
+        const clampedLeft = Math.min(
+          Math.max(left - tooltipWidth / 2, 8),
+          frameRect.width - tooltipWidth - 8,
+        );
+
+        tooltip.style.left = `${clampedLeft}px`;
+        tooltip.style.top = "8px";
+      };
+
+      const handleMove = (event) => {
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+          const rect = svg.getBoundingClientRect();
+          const relativeX = ((event.clientX - rect.left) / rect.width) * 560;
+
+          let nearest = points[0];
+          let distance = Math.abs(points[0].x - relativeX);
+
+          for (let index = 1; index < points.length; index += 1) {
+            const point = points[index];
+            const currentDistance = Math.abs(point.x - relativeX);
+
+            if (currentDistance < distance) {
+              nearest = point;
+              distance = currentDistance;
+            }
+          }
+
+          renderPoint(nearest);
+        });
+      };
+
+      const handleLeave = () => {
+        tooltip.hidden = true;
+        focusLine.classList.remove("is-visible");
+        focusDot.classList.remove("is-visible");
+      };
+
+      hitbox.addEventListener("pointermove", handleMove);
+      hitbox.addEventListener("pointerenter", handleMove);
+      hitbox.addEventListener("pointerleave", handleLeave);
+    });
+  })();
+</script>
+
+<style>
+  .commit-graph {
+    width: 100%;
+  }
+
+  .commit-graph__frame {
+    position: relative;
+    border-radius: 1rem;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.44)),
+      linear-gradient(135deg, rgba(167, 139, 250, 0.08), rgba(52, 211, 153, 0.08));
+    box-shadow: inset 0 0 0 1px rgba(35, 33, 29, 0.08);
+    overflow: hidden;
+  }
+
+  .commit-graph__meta {
+    position: absolute;
+    top: 0.8rem;
+    left: 0.9rem;
+    z-index: 2;
+  }
+
+  .commit-graph__repo {
+    color: #23211d;
+    font-size: 0.9rem;
+    font-weight: 620;
+    letter-spacing: -0.02em;
+  }
+
+  .commit-graph__subtle {
+    color: #6c665e;
+    font-size: 0.76rem;
+    line-height: 1.35;
+  }
+
+  .commit-graph__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .commit-graph__hitbox {
+    fill: transparent;
+    cursor: crosshair;
+  }
+
+  .commit-graph__focus-line {
+    stroke: rgba(35, 33, 29, 0.18);
+    stroke-width: 1;
+    opacity: 0;
+    transition: opacity 120ms ease;
+  }
+
+  .commit-graph__focus-dot {
+    fill: #ffffff;
+    stroke: #34d399;
+    stroke-width: 2.5;
+    opacity: 0;
+    transition: opacity 120ms ease;
+  }
+
+  .commit-graph__focus-line.is-visible,
+  .commit-graph__focus-dot.is-visible {
+    opacity: 1;
+  }
+
+  .commit-graph__tooltip {
+    position: absolute;
+    z-index: 4;
+    min-width: 12rem;
+    max-width: min(18rem, calc(100% - 1rem));
+    border: 1px solid rgba(35, 33, 29, 0.12);
+    border-radius: 0.9rem;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 14px 28px rgba(35, 33, 29, 0.12);
+    padding: 0.7rem 0.8rem;
+    pointer-events: none;
+  }
+
+  .commit-graph__tooltip-date,
+  .commit-graph__tooltip-meta {
+    color: #6c665e;
+    font-size: 0.78rem;
+  }
+
+  .commit-graph__tooltip-message {
+    margin: 0.18rem 0 0.25rem;
+    color: #23211d;
+    font-size: 0.88rem;
+    line-height: 1.35;
+  }
+
+  .commit-graph__legend {
+    margin-top: 0.45rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    color: #6c665e;
+    font-size: 0.78rem;
+  }
+</style>

@@ -1,0 +1,1148 @@
+---
+import "@fontsource-variable/manrope";
+import CommitGraph from "../components/CommitGraph.astro";
+import { projectCommitGraphs } from "../data/projectCommitGraphs";
+
+const about =
+  "Engineer (extremely) interested in highly performant runtimes, system architecture, networking protocols, and machine learning.";
+
+const sections = [
+  {
+    id: "projects",
+    label: "Projects",
+    items: [
+      {
+        slug: "quilt",
+        title: "Quilt",
+        kind: "Container Runtime",
+        status: "Shipped (Production)",
+        blurb:
+          "The foundation for autonomous infrastructure: one system for containers, clusters, mesh networks, and serverless execution.",
+        notes: [
+          "Built to make infrastructure programmable enough for agents, not just operators.",
+          "Brings runtime control, cluster orchestration, and product-facing APIs into one surface.",
+          "Designed as a base layer you can actually build products and automation on top of.",
+        ],
+        tags: ["runtime", "platform", "containers", "gpu"],
+        related: ["mesh", "rlm"],
+        repo: "ariacomputecompany/quilt-core",
+        links: [
+          { label: "landing page", href: "https://quilt.sh" },
+          { label: "sdk", href: "https://github.com/ariacomputecompany/quilt-sdk" },
+        ],
+      },
+      {
+        slug: "mesh",
+        title: "Mesh",
+        kind: "Distributed Inference",
+        status: "Shipped (Testing)",
+        blurb:
+          "P2P distributed inference for heterogeneous compute.",
+        notes: [
+          "Designed for uneven fleets, not idealized racks of identical GPUs.",
+          "Focuses on making coordination, serving, and recovery feel native across mixed machines.",
+          "Includes a durable credit system that reserves, settles, and releases usage against real worker participation.",
+        ],
+        tags: ["inference", "distributed systems", "scheduler"],
+        related: ["sock", "zip"],
+        repo: "saint0x/mesh",
+        links: [
+          { label: "github", href: "https://github.com/saint0x/mesh" },
+        ],
+      },
+      {
+        slug: "fzy",
+        title: "Fzy",
+        kind: "Systems Language",
+        status: "Shipped (v0)",
+        blurb:
+          "A systems programming language and compiler for runtime engineering.",
+        notes: [
+          "Designed around performance, determinism, safety, and correctness rather than convenience-first abstractions.",
+          "Supports bidirectional C interop, strict memory safety with manual memory management and an explicit unsafe paradigm, GPU and SIMD work, native async, RPC, and concurrency.",
+          "Also carries modern language features like pattern matching and algebraic data types without giving up low-level control.",
+        ],
+        tags: ["language", "compiler", "toolchain", "determinism"],
+        related: ["fozzy", "strand", "superctx", "timelapse"],
+        repo: "saint0x/fzy",
+        links: [
+          { label: "github", href: "https://github.com/saint0x/fzy" },
+        ],
+      },
+      {
+        slug: "tl",
+        title: "Timelapse",
+        kind: "Versioning Daemon",
+        status: "Shipped (v0)",
+        blurb:
+          "Automatic version control for AI-assisted development.",
+        notes: [
+          "The idea is simple: exploratory work should still be recoverable without turning every thought into a manual commit.",
+          "Built on Jujutsu for Git compatibility, but centered on checkpointing, restore, diff, and publish flows.",
+          "Made for fast, messy, iterative building where confidence matters as much as speed.",
+        ],
+        tags: ["version control", "developer tools", "daemon", "jj"],
+        related: ["ice", "fozzy", "remyy"],
+        repo: "saint0x/tl",
+        links: [
+          { label: "github", href: "https://github.com/saint0x/tl" },
+        ],
+      },
+      {
+        slug: "3d",
+        title: "CAD Engine",
+        kind: "3D Modeling Engine",
+        status: "Development (Last Mile)",
+        blurb:
+          "A CAD-style modeling engine for precise 3D workflows across product UI and geometry systems.",
+        notes: [
+          "Combines a Rust geometry core with a product surface that feels like a real modeling tool, not just a rendering demo.",
+          "Keeps operation history explicit so scenes can be replayed, edited, and validated over time.",
+          "It is in the last-mile phase now: mostly polish, hardening, and product finish.",
+        ],
+        tags: ["3d", "cad", "rust", "react"],
+        related: ["fozzy", "aria", "sled-sheets"],
+        repo: "saint0x/3d",
+        links: [
+          { label: "github", href: "https://github.com/saint0x/3d" },
+        ],
+      },
+      {
+        slug: "remyy",
+        title: "Remyy",
+        kind: "Remote Shell",
+        status: "Shipped (v0)",
+        blurb:
+          "Remote shell and tunnels for reaching your own machine from any browser, especially your phone.",
+        notes: [
+          "The core experience is immediacy: open a link, scan a QR code, and you are in.",
+          "It treats reconnects, scrollback, and mobile input as first-class concerns instead of broken edge cases.",
+          "It can also expose local services and pair cleanly with sandboxed environments when needed.",
+        ],
+        tags: ["remote access", "terminal", "tunnels", "mobile"],
+        related: ["aegis", "quilt", "timelapse"],
+        repo: "saint0x/remyy",
+        links: [
+          { label: "github", href: "https://github.com/saint0x/remyy" },
+        ],
+      },
+      {
+        slug: "sled-sheets",
+        title: "Sled Sheets",
+        kind: "Collaborative Spreadsheet Engine",
+        status: "Shipped (v0)",
+        blurb:
+          "A collaborative spreadsheet engine in Rust with formulas, live sync, charts, and agent tooling.",
+        notes: [
+          "It is less about cloning a spreadsheet brand and more about building the spreadsheet as a serious programmable system.",
+          "Designed around incremental recalculation, CRDT collaboration, and durable storage backends.",
+          "Pushes toward spreadsheets as shared software surfaces, not just static tables.",
+        ],
+        tags: ["spreadsheet", "rust", "crdt", "calc engine"],
+        related: ["aria", "3d", "timelapse"],
+        repo: "saint0x/sled-sheets",
+        links: [
+          { label: "github", href: "https://github.com/saint0x/sled-sheets" },
+        ],
+      },
+      {
+        slug: "aegis",
+        title: "Aegis",
+        kind: "Agent Browser",
+        status: "Shipped (v0)",
+        blurb:
+          "An agent browser built for real web work, not mocked DOM automation.",
+        notes: [
+          "One persistent browser session, one control plane, and one execution path whether it is headful or headless.",
+          "Designed around the things agent workflows actually need: state, navigation, inspection, files, and continuity.",
+          "It is closer to operating a browser than scripting a test runner.",
+        ],
+        tags: ["browser", "automation", "runtime"],
+        related: ["aria", "fozzy", "remyy"],
+        repo: "ariacomputecompany/aegis",
+        links: [
+          { label: "github", href: "https://github.com/ariacomputecompany/aegis" },
+        ],
+      },
+      {
+        slug: "fozzy",
+        title: "Fozzy",
+        kind: "Deterministic Testing Runtime",
+        status: "Shipped (v0)",
+        blurb:
+          "A deterministic testing runtime for systems that are hard to trust by inspection alone.",
+        notes: [
+          "It turns failures into artifacts you can replay, shrink, verify, and share.",
+          "Built for race conditions, distributed bugs, hangs, and other problems that disappear the moment you look at them.",
+          "The bigger idea is operational confidence through evidence instead of guesswork.",
+        ],
+        tags: ["testing", "fuzzing", "replay", "ci"],
+        related: ["fzy", "sock", "tmh"],
+        repo: "ariacomputecompany/fozzy",
+        links: [
+          { label: "github", href: "https://github.com/ariacomputecompany/fozzy" },
+        ],
+      },
+      {
+        slug: "aria",
+        title: "Aria",
+        kind: "Agentic Computer",
+        status: "Development (Stealth)",
+        blurb:
+          "An agentic computer built around a local orchestrator, real tools, memory, and GPU-native intelligence.",
+        notes: [
+          "The orchestrator agent acts like the CPU, coordinating work, state, memory, and execution.",
+          "The SDK is the app layer, so tools, agents, teams, pipelines, and workflows can be built on top in a structured way.",
+          "Quilt containers provide isolated execution like multithreaded runtime lanes, while the Tauri desktop app is the UI around the whole machine.",
+        ],
+        tags: ["rust", "assistant infra", "gateway"],
+        related: ["aegis", "ice", "quilt"],
+        repo: "ariacomputecompany/aria",
+        links: [
+          { label: "github", href: "https://github.com/ariacomputecompany/aria" },
+          { label: "sdk", href: "https://github.com/ariacomputecompany/aria-sdk" },
+        ],
+      },
+      {
+        slug: "ice",
+        title: "Ice",
+        kind: "Desktop Environment",
+        status: "Development (Last Mile)",
+        blurb:
+          "An integrated development environment with a native browser, git, file browsing, AI chat, and terminals in one workspace.",
+        notes: [
+          "Built for real multi-project work instead of one editor pane at a time.",
+          "Puts browser, terminal, repository, and assistant in the same native workspace.",
+          "The aim is to make the whole environment feel calm, fast, and actually useful every day.",
+        ],
+        tags: ["desktop", "tauri", "workspace"],
+        related: ["aria", "aegis"],
+        repo: "saint0x/ice",
+        links: [
+          { label: "github", href: "https://github.com/saint0x/ice" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "explorations",
+    label: "Explorations",
+    items: [
+      {
+        slug: "tmh",
+        title: "TMH",
+        kind: "Tiered Memory Hierarchy",
+        status: "research",
+        blurb:
+          "A framing of inference memory as a heterogeneous hierarchy rather than a flat KV cache.",
+        notes: [
+          "The point is to treat inference memory like a real systems problem instead of a single-cache abstraction.",
+          "Current Qwen stress runs reduced warm-memory footprint by about 16.1% versus the compressed-retention baseline while modestly improving task outcomes.",
+          "The core claim is that old memory should be demoted in fidelity, not simply evicted.",
+        ],
+        tags: ["research", "inference", "memory systems"],
+        related: ["fozzy", "sock", "fzy"],
+        links: [],
+      },
+      {
+        slug: "zipml",
+        title: "ZipML",
+        kind: "Training Runtime",
+        status: "exploration",
+        blurb:
+          "A runtime for P2P distributed post-training, fine-tuning, and reinforcement learning across heterogeneous compute.",
+        notes: [
+          "It asks what serious training infrastructure looks like when the machines are uneven and the cluster is messy.",
+          "Starts from rollouts, adapters, and post-training rather than pretending the first step is giant synchronous training.",
+          "Built around explicit runtime modes, worker capabilities, and durable coordination.",
+        ],
+        tags: ["training", "rl", "distributed systems", "heterogeneous compute"],
+        related: ["mesh", "fozzy", "tmh"],
+        links: [
+          { label: "github", href: "https://github.com/ariacomputecompany/zipml" },
+        ],
+      },
+      {
+        slug: "sock-exploration",
+        title: "Sock",
+        kind: "Compiler Study",
+        status: "exploration",
+        blurb:
+          "A streamlined compiler for inference engines that improves compile times, developer experience, and runtime performance.",
+        notes: [
+          "It treats engine bring-up as a compilation problem rather than a pile of incidental scripts.",
+          "Vendors an optimized vLLM fork natively where that makes the workflow cleaner.",
+          "The goal is a shorter, clearer path from model system to runnable inference product.",
+        ],
+        tags: ["inference", "compiler thinking", "readiness"],
+        related: ["sock", "tmh", "mesh"],
+        links: [],
+      },
+      {
+        slug: "rlm",
+        title: "RLM",
+        kind: "Workflow Image",
+        status: "exploration",
+        blurb:
+          "A native environment for recursive language models built on Quilt infrastructure.",
+        notes: [
+          "The agent has a REPL, state, context, and a runtime surface that can actually hold onto a line of thought.",
+          "Packages the manifests, logs, trajectories, and helper surfaces these systems actually need.",
+          "Keeps the whole loop reproducible enough to inspect, rerun, and evolve.",
+        ],
+        tags: ["image", "workflow", "quilt"],
+        related: ["quilt", "mesh"],
+        links: [
+          { label: "rlm docs", href: "https://docs.quilt.sh/tooling/rlm" },
+        ],
+      },
+      {
+        slug: "strand",
+        title: "Strand",
+        kind: "Investigative Runtime",
+        status: "exploration",
+        blurb:
+          "An attempt to apply deterministic testing ideas to an LLM's subjective investigation.",
+        notes: [
+          "The question is whether evidence collection, uncertainty, and conviction can be modeled more explicitly.",
+          "Instead of treating investigation as vibes, it tries to make the process inspectable and replayable.",
+          "It is an attempt to give subjective reasoning a stronger operational shape.",
+        ],
+        tags: ["runtime", "investigation", "determinism"],
+        related: ["fzy", "superctx", "fozzy"],
+        links: [
+          { label: "github", href: "https://github.com/saint0x/strand" },
+        ],
+      },
+      {
+        slug: "superctx",
+        title: "Superctx",
+        kind: "Context Runtime",
+        status: "exploration",
+        blurb:
+          "A runtime for treating context window state as dynamic, swappable, and explicit.",
+        notes: [
+          "Instead of one monolithic prompt, context becomes something assembled, exchanged, and reasoned about.",
+          "Useful for agents that need memory operations, scoped state, and deliberate retrieval.",
+          "The underlying idea is that context management should be a system, not a prompt hack.",
+        ],
+        tags: ["context", "memory", "agents", "fzy"],
+        related: ["fzy", "strand", "aria"],
+        links: [
+          { label: "github", href: "https://github.com/saint0x/superctx" },
+        ],
+      },
+    ],
+  },
+  {
+    id: "reading-list",
+    label: "Reading List",
+    items: [
+      {
+        slug: "bed-of-procrustes",
+        title: "The Bed of Procrustes",
+        kind: "Book",
+        status: "Reading",
+        blurb:
+          "A book of aphorisms in which Nassim Nicholas Taleb reflects on uncertainty, knowledge, modernity, and the distortions created when reality is forced into overly neat systems.",
+        notes: [],
+        tags: ["philosophy", "judgment", "systems"],
+      },
+      {
+        slug: "where-great-ideas-come-from",
+        title: "Where Good Ideas Come From",
+        kind: "Book",
+        status: "Finished",
+        blurb:
+          "Steven Johnson argues that innovation usually emerges from connected environments, slow hunches, and the recombination of existing ideas rather than isolated flashes of genius.",
+        notes: [],
+        tags: ["creativity", "innovation", "research"],
+      },
+      {
+        slug: "emotional-design",
+        title: "Emotional Design",
+        kind: "Book",
+        status: "Finished",
+        blurb:
+          "Don Norman explores how products work not just through usability, but through emotional response at visceral, behavioral, and reflective levels.",
+        notes: [],
+        tags: ["design", "ux", "product"],
+      },
+      {
+        slug: "emissaries-guide-to-worlding",
+        title: "The Emissary's Guide to Worlding",
+        kind: "Book",
+        status: "Finished",
+        blurb:
+          "Ian Cheng's book examines how to create living, autonomous worlds and how to think about worldbuilding as an open-ended psychological and artistic practice.",
+        notes: [],
+        tags: ["worldbuilding", "theory", "systems thinking"],
+        links: [],
+      },
+      {
+        slug: "hard-to-be-a-god",
+        title: "Hard to Be a God",
+        kind: "Book",
+        status: "Up Next",
+        blurb:
+          "A science-fiction novel about an observer from an advanced Earth embedded in a brutal medieval society, wrestling with power, non-interference, and moral responsibility.",
+        notes: [],
+        tags: ["fiction", "politics", "ethics"],
+        links: [],
+      },
+      {
+        slug: "mans-search-for-meaning",
+        title: "Man's Search for Meaning",
+        kind: "Book",
+        status: "Finished",
+        blurb:
+          "Viktor Frankl combines his concentration-camp experience with logotherapy, arguing that people can endure profound suffering when they retain a sense of purpose and meaning.",
+        notes: [],
+        tags: ["meaning", "psychology", "resilience"],
+        links: [],
+      },
+    ],
+  },
+  {
+    id: "blog",
+    label: "Blog",
+    items: [
+      {
+        slug: "systems-as-ux",
+        title: "Systems as UX",
+        kind: "Essay",
+        status: "draft",
+        blurb:
+          "A short piece about how infrastructure decisions surface directly as felt product experience.",
+        notes: [
+          "Explores the connection between runtime design and interface calm.",
+          "Meant to bridge engineering depth and product taste.",
+        ],
+        tags: ["systems", "ux", "writing"],
+        related: ["Quilt", "Aegis", "Sock"],
+        links: [],
+      },
+      {
+        slug: "determinism-and-trust",
+        title: "Determinism and Trust",
+        kind: "Essay",
+        status: "draft",
+        blurb:
+          "Notes on why replayability, evidence, and exactness matter for modern software systems.",
+        notes: [
+          "Centered on validation, debugging, and operational confidence.",
+          "Pulls examples from language, testing, and agent runtimes.",
+        ],
+        tags: ["determinism", "testing", "runtime"],
+        related: ["Fozzy", "Fzy", "Strand"],
+        links: [],
+      },
+      {
+        slug: "quiet-product-surfaces",
+        title: "Quiet Product Surfaces",
+        kind: "Essay",
+        status: "idea",
+        blurb:
+          "A design note on making dense product information feel calm, direct, and legible.",
+        notes: [
+          "About reduction, hierarchy, and leaving only the useful structure.",
+          "Very aligned with how this portfolio is being shaped.",
+        ],
+        tags: ["design", "product", "clarity"],
+        related: ["Reading List", "Explorations"],
+        links: [],
+      },
+    ],
+  },
+  {
+    id: "contact",
+    label: "Contact",
+    items: [
+      {
+        slug: "contact",
+        title: "Contact",
+        kind: "How To Reach Me",
+        status: "Head of engineering @ Synthesys AI",
+        blurb:
+          "",
+        notes: [
+          "Open to collaboration, consulting, and contract work.",
+          "Open to interview conversations that are genuinely aligned, interesting, and tied to real intent.",
+          "Best outreach is short, direct, and specific about the problem space.",
+        ],
+        tags: ["collaboration", "consulting", "contract work"],
+        links: [
+          { label: "company", href: "https://synthesys.app" },
+          { label: "email", href: "mailto:saint.0x.saint@gmail.com" },
+          { label: "x", href: "https://x.com/thetronchguy" },
+          { label: "linkedin", href: "https://linkedin.com" },
+        ],
+      },
+    ],
+  },
+];
+
+const displayNameMap = new Map(
+  sections
+    .flatMap((section) => [section.label, ...section.items.map((item) => item.title)])
+    .map((value) => [value.toLowerCase(), value]),
+);
+
+const acronymMap = new Map([
+  ["3d", "3D"],
+  ["ai", "AI"],
+  ["api", "API"],
+  ["c", "C"],
+  ["ci", "CI"],
+  ["dx", "DX"],
+  ["gpu", "GPU"],
+  ["github", "GitHub"],
+  ["jj", "JJ"],
+  ["kv", "KV"],
+  ["llm", "LLM"],
+  ["ml", "ML"],
+  ["os", "OS"],
+  ["p2p", "P2P"],
+  ["qlora", "QLoRA"],
+  ["rl", "RL"],
+  ["rlhf", "RLHF"],
+  ["rlm", "RLM"],
+  ["rpc", "RPC"],
+  ["sdk", "SDK"],
+  ["simd", "SIMD"],
+  ["sft", "SFT"],
+  ["tmh", "TMH"],
+  ["ux", "UX"],
+  ["vllm", "vLLM"],
+]);
+
+function formatMetaValue(value: string) {
+  const trimmed = value.trim();
+  const mapped = displayNameMap.get(trimmed.toLowerCase()) ?? acronymMap.get(trimmed.toLowerCase());
+
+  if (mapped) return mapped;
+
+  return trimmed
+    .split(" ")
+    .map((word) =>
+      word
+        .split("-")
+        .map((part) => {
+          const acronym = acronymMap.get(part.toLowerCase());
+          if (acronym) return acronym;
+          return part ? `${part.charAt(0).toUpperCase()}${part.slice(1)}` : part;
+        })
+        .join("-"),
+    )
+    .join(" ");
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Saint</title>
+    <meta
+      name="description"
+      content="Minimal engineering portfolio and reading list for Saint."
+    />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="site-title" href="/">Saint</a>
+        <p class="site-role">Distributed Systems Engineer</p>
+      </header>
+
+      <main>
+        <section class="about">
+          <span class="section-label">About</span>
+          <p>{about}</p>
+        </section>
+
+        <section class="filters">
+          <nav class="filter-row" aria-label="Sections">
+            {
+              sections.map((section, index) => (
+                <button
+                  class:list={[
+                    "filter-pill",
+                    { "is-active": index === 0, "is-disabled": section.id === "blog" },
+                  ]}
+                  type="button"
+                  data-category-trigger
+                  data-category={section.id}
+                  aria-pressed={index === 0 ? "true" : "false"}
+                  disabled={section.id === "blog"}
+                >
+                  {section.label}
+                </button>
+              ))
+            }
+          </nav>
+        </section>
+
+        <section class="browser">
+          <aside class="timeline" aria-label="Timeline">
+            <div class="timeline-list" data-timeline-list></div>
+          </aside>
+
+          <div class="details">
+            {
+              sections.map((section, sectionIndex) => (
+                <section
+                  class:list={["project-group", { "is-active": sectionIndex === 0 }]}
+                  data-category-panel={section.id}
+                  hidden={sectionIndex === 0 ? undefined : true}
+                >
+                  {
+                    section.items.map((item, itemIndex) => (
+                      <article
+                        class:list={["project-entry", { "is-active": itemIndex === 0 }]}
+                        id={item.slug}
+                        data-project-card
+                        data-project-title={item.title}
+                        hidden={itemIndex === 0 ? undefined : true}
+                      >
+                        <span class="project-kind">{item.kind}</span>
+                        {
+                          item.cover && (
+                            <div class="entry-cover-wrap">
+                              <div class="cover-slot">{item.cover}</div>
+                            </div>
+                          )
+                        }
+                        <h2>{item.title}</h2>
+                        <p class="project-blurb">{item.blurb}</p>
+
+                        <ul class="project-points">
+                          {item.notes.map((note) => <li>{note}</li>)}
+                        </ul>
+
+                        <dl class="meta-list">
+                          <div class="meta-row">
+                            <dt>Status</dt>
+                            <dd>{formatMetaValue(item.status)}</dd>
+                          </div>
+
+                          <div class="meta-row">
+                            <dt>Tags</dt>
+                            <dd class="meta-tags">
+                              {item.tags.map((tag) => <span>{formatMetaValue(tag)}</span>)}
+                            </dd>
+                          </div>
+
+                          {
+                            item.related && (
+                              <div class="meta-row">
+                                <dt>Related</dt>
+                                <dd>{item.related.map((value) => formatMetaValue(value)).join(", ")}</dd>
+                              </div>
+                            )
+                          }
+
+                          <div class="meta-row">
+                            <dt>Links</dt>
+                            <dd class="meta-links">
+                              {item.links && item.links.length > 0 ? (
+                                item.links.map((link) =>
+                                  link.href ? (
+                                    <a href={link.href} target="_blank" rel="noreferrer">
+                                      {formatMetaValue(link.label)}
+                                    </a>
+                                  ) : (
+                                    <span>{formatMetaValue(link.label)}</span>
+                                  ),
+                                )
+                              ) : (
+                                <span class="meta-empty">None Yet</span>
+                              )}
+                            </dd>
+                          </div>
+
+                          {
+                            section.id === "projects" && (
+                              <div class="meta-row meta-row--graph">
+                                <dt>Graph</dt>
+                                <dd>
+                                  <CommitGraph
+                                    graphId={item.slug}
+                                    repo={item.repo}
+                                    points={projectCommitGraphs[item.slug as keyof typeof projectCommitGraphs]}
+                                  />
+                                </dd>
+                              </div>
+                            )
+                          }
+
+                        </dl>
+                      </article>
+                    ))
+                  }
+                </section>
+              ))
+            }
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const triggers = Array.from(document.querySelectorAll("[data-category-trigger]"));
+      const panels = Array.from(document.querySelectorAll("[data-category-panel]"));
+      const timelineList = document.querySelector("[data-timeline-list]");
+
+      let activeCategory = triggers[0]?.dataset.category;
+      let activeTimelineButtons = [];
+      let activeCards = [];
+
+      function setActiveProject(cardId) {
+        activeCards.forEach((card) => {
+          const isCurrent = card.id === cardId;
+          card.hidden = !isCurrent;
+          card.classList.toggle("is-active", isCurrent);
+        });
+
+        activeTimelineButtons.forEach((button) => {
+          const isCurrent = button.dataset.target === cardId;
+          button.classList.toggle("is-current", isCurrent);
+          button.setAttribute("aria-current", isCurrent ? "true" : "false");
+        });
+      }
+
+      function buildTimeline(categoryId) {
+        const panel = panels.find((entry) => entry.dataset.categoryPanel === categoryId);
+        if (!panel || !timelineList) return;
+
+        activeCards = Array.from(panel.querySelectorAll("[data-project-card]"));
+        timelineList.innerHTML = "";
+
+        activeTimelineButtons = activeCards.map((card, index) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "timeline-item";
+          button.dataset.target = card.id;
+          button.setAttribute("aria-current", index === 0 ? "true" : "false");
+          button.innerHTML = `
+            <span class="timeline-item__dot" aria-hidden="true"></span>
+            <span class="timeline-item__text">
+              <span class="timeline-item__title">${card.dataset.projectTitle ?? ""}</span>
+            </span>
+          `;
+
+          button.addEventListener("click", () => {
+            setActiveProject(card.id);
+          });
+
+          timelineList.appendChild(button);
+          return button;
+        });
+
+        setActiveProject(activeCards[0]?.id);
+      }
+
+      function setCategory(categoryId) {
+        activeCategory = categoryId;
+
+        triggers.forEach((trigger) => {
+          const isActive = trigger.dataset.category === categoryId;
+          trigger.classList.toggle("is-active", isActive);
+          trigger.setAttribute("aria-pressed", isActive ? "true" : "false");
+        });
+
+        panels.forEach((panel) => {
+          const isActive = panel.dataset.categoryPanel === categoryId;
+          panel.hidden = !isActive;
+          panel.classList.toggle("is-active", isActive);
+
+          if (!isActive) {
+            panel.querySelectorAll("[data-project-card]").forEach((card) => {
+              card.hidden = true;
+              card.classList.remove("is-active");
+            });
+          }
+        });
+
+        buildTimeline(categoryId);
+      }
+
+      triggers.forEach((trigger) => {
+        trigger.addEventListener("click", () => {
+          const nextCategory = trigger.dataset.category;
+          if (!nextCategory || nextCategory === activeCategory) return;
+          setCategory(nextCategory);
+        });
+      });
+
+      if (activeCategory) {
+        setCategory(activeCategory);
+      }
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #fcfbf8;
+    --text: #23211d;
+    --muted: #6c665e;
+    --line: rgba(35, 33, 29, 0.12);
+    --line-strong: rgba(35, 33, 29, 0.22);
+    --fill: #f3efe8;
+    --fill-strong: #ebe5dc;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Manrope Variable", "Avenir Next", "Helvetica Neue", sans-serif;
+    line-height: 1.55;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  a,
+  button {
+    color: inherit;
+    font: inherit;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  p,
+  h2,
+  ul,
+  dl,
+  dd {
+    margin: 0;
+  }
+
+  .page-shell {
+    margin: 0 auto;
+    max-width: 72rem;
+    padding: 5.5rem 1.5rem 4rem;
+  }
+
+  .site-header {
+    margin-bottom: 5rem;
+  }
+
+  .site-title,
+  .site-role,
+  .section-label,
+  .filter-pill,
+  .project-kind,
+  .timeline-item__title,
+  .meta-row dt {
+    letter-spacing: -0.02em;
+  }
+
+  .site-title {
+    display: inline-block;
+    font-size: 1rem;
+    font-weight: 650;
+  }
+
+  .site-role {
+    color: var(--muted);
+    font-size: 1rem;
+    font-weight: 560;
+    line-height: 1.2;
+  }
+
+  main {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .section-label {
+    display: block;
+    margin-bottom: 0.9rem;
+    font-weight: 650;
+  }
+
+  .about {
+    max-width: 34rem;
+  }
+
+  .about p {
+    color: var(--muted);
+  }
+
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .filter-pill {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 560;
+    padding: 0.28rem 0.7rem;
+    transition:
+      border-color 140ms ease,
+      background-color 140ms ease,
+      color 140ms ease;
+  }
+
+  .filter-pill:hover,
+  .filter-pill:focus-visible {
+    border-color: var(--line-strong);
+    background: var(--fill);
+    color: var(--text);
+    outline: none;
+  }
+
+  .filter-pill.is-active {
+    border-color: var(--line-strong);
+    background: var(--fill-strong);
+    color: var(--text);
+  }
+
+  .filter-pill.is-disabled {
+    border-color: rgba(35, 33, 29, 0.08);
+    background: transparent;
+    color: rgba(108, 102, 94, 0.46);
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .browser {
+    display: grid;
+    grid-template-columns: 13rem minmax(0, 1fr);
+    gap: 3.5rem;
+    align-items: start;
+  }
+
+  .timeline {
+    position: sticky;
+    top: 2rem;
+    align-self: start;
+  }
+
+  .timeline-list {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    padding-left: 1rem;
+  }
+
+  .timeline-list::before {
+    content: "";
+    position: absolute;
+    left: 0.24rem;
+    top: 0.48rem;
+    bottom: 0.48rem;
+    width: 1px;
+    background: var(--line);
+  }
+
+  .timeline-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 0.7rem minmax(0, 1fr);
+    gap: 0.7rem;
+    align-items: start;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    text-align: left;
+  }
+
+  .timeline-item__dot {
+    position: relative;
+    margin-top: 0.42rem;
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 999px;
+    background: #d6d0c7;
+    z-index: 1;
+    transition: background-color 140ms ease, transform 140ms ease;
+  }
+
+  .timeline-item__title {
+    color: var(--muted);
+    font-size: 0.92rem;
+    font-weight: 560;
+    transition: color 140ms ease;
+  }
+
+  .timeline-item:hover .timeline-item__dot,
+  .timeline-item.is-current .timeline-item__dot {
+    background: var(--text);
+    transform: scale(1.1);
+  }
+
+  .timeline-item:hover .timeline-item__title,
+  .timeline-item.is-current .timeline-item__title {
+    color: var(--text);
+  }
+
+  .timeline-item:focus-visible {
+    outline: none;
+  }
+
+  .project-group {
+    display: none;
+  }
+
+  .project-group.is-active {
+    display: block;
+  }
+
+  .project-entry {
+    max-width: 42rem;
+  }
+
+  .project-entry:not(.is-active) {
+    display: none;
+  }
+
+  .project-kind {
+    display: inline-block;
+    margin-bottom: 0.3rem;
+    color: var(--muted);
+    font-size: 0.83rem;
+    font-weight: 560;
+  }
+
+  .project-entry h2 {
+    font-size: 1.2rem;
+    font-weight: 650;
+    line-height: 1.2;
+  }
+
+  .entry-cover-wrap {
+    margin: 0.55rem 0 0.9rem;
+  }
+
+  .project-blurb {
+    margin-top: 0.45rem;
+    color: var(--muted);
+  }
+
+  .project-points {
+    margin-top: 0.9rem;
+    padding-left: 1rem;
+    color: var(--muted);
+  }
+
+  .project-points li + li {
+    margin-top: 0.38rem;
+  }
+
+  .meta-list {
+    margin-top: 1rem;
+    display: grid;
+    gap: 0.72rem;
+  }
+
+  .meta-row {
+    display: grid;
+    grid-template-columns: 6rem minmax(0, 1fr);
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .meta-row dt {
+    color: var(--text);
+    font-size: 0.9rem;
+    font-weight: 620;
+  }
+
+  .meta-row dd {
+    color: var(--muted);
+    min-width: 0;
+  }
+
+  .meta-tags,
+  .meta-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 0.65rem;
+  }
+
+  .meta-tags span {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.18rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .meta-links a,
+  .meta-links span {
+    word-break: break-word;
+  }
+
+  .meta-links a {
+    text-decoration: underline;
+    text-underline-offset: 0.12rem;
+  }
+
+  .cover-slot {
+    display: grid;
+    place-items: center;
+    width: 6rem;
+    aspect-ratio: 2 / 3;
+    border: 1px dashed var(--line-strong);
+    color: var(--muted);
+    font-size: 0.8rem;
+    text-transform: lowercase;
+  }
+
+  @media (max-width: 820px) {
+    .browser {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .timeline {
+      position: static;
+    }
+
+    .timeline-list {
+      padding-left: 0;
+    }
+
+    .timeline-list::before {
+      display: none;
+    }
+
+    .meta-row {
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .page-shell {
+      padding: 3rem 1rem 3rem;
+    }
+
+    .site-header {
+      margin-bottom: 3rem;
+    }
+  }
+</style>

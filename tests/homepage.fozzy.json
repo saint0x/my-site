@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "name": "homepage-smoke",
+  "steps": [
+    {
+      "type": "trace_event",
+      "name": "homepage smoke start"
+    },
+    {
+      "type": "proc_when",
+      "cmd": "/bin/sh",
+      "args": [
+        "-c",
+        "/Users/deepsaint/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node ./node_modules/astro/bin/astro.mjs build >/dev/null"
+      ],
+      "exit_code": 0,
+      "times": 1
+    },
+    {
+      "type": "proc_spawn",
+      "cmd": "/bin/sh",
+      "args": [
+        "-c",
+        "/Users/deepsaint/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node ./node_modules/astro/bin/astro.mjs build >/dev/null"
+      ],
+      "expect_exit": 0
+    },
+    {
+      "type": "proc_when",
+      "cmd": "curl",
+      "args": ["-fsS", "-o", "/dev/null", "http://localhost:4321"],
+      "exit_code": 0,
+      "times": 1
+    },
+    {
+      "type": "proc_spawn",
+      "cmd": "curl",
+      "args": ["-fsS", "-o", "/dev/null", "http://localhost:4321"],
+      "expect_exit": 0
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "fozzy.run_manifest.v1",
+  "runId": "d9bdf805-7b32-494d-817f-7d1e97debe69",
+  "mode": "run",
+  "status": "pass",
+  "seed": 14258883328352251789,
+  "startedAt": "2026-07-01T20:07:00.724599Z",
+  "finishedAt": "2026-07-01T20:07:00.724707Z",
+  "durationMs": 1,
+  "durationNs": 104083,
+  "tracePath": ".fozzy/homepage.trace.fozzy",
+  "reportPath": ".fozzy/runs/d9bdf805-7b32-494d-817f-7d1e97debe69/report.json",
+  "artifactsDir": ".fozzy/runs/d9bdf805-7b32-494d-817f-7d1e97debe69",
+  "findingsCount": 0,
+  "memoryLeakedBytes": 0,
+  "memoryLeakedAllocs": 0,
+  "memoryPeakBytes": 0,
+  "summary": {
+    "status": "pass",
+    "mode": "run",
+    "identity": {
+      "runId": "d9bdf805-7b32-494d-817f-7d1e97debe69",
+      "seed": 14258883328352251789,
+      "tracePath": ".fozzy/homepage.trace.fozzy",
+      "reportPath": ".fozzy/runs/d9bdf805-7b32-494d-817f-7d1e97debe69/report.json",
+      "artifactsDir": ".fozzy/runs/d9bdf805-7b32-494d-817f-7d1e97debe69"
+    },
+    "startedAt": "2026-07-01T20:07:00.724599Z",
+    "finishedAt": "2026-07-01T20:07:00.724707Z",
+    "durationMs": 1,
+    "durationNs": 104083,
+    "memory": {
+      "allocCount": 0,
+      "freeCount": 0,
+      "failedAllocCount": 0,
+      "inUseBytes": 0,
+      "peakBytes": 0,
+      "leakedBytes": 0,
+      "leakedAllocs": 0
+    }
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "fozzy.run_alias_index.v1",
+  "entries": [
+    {
+      "runId": "956f7977-e93d-47f4-9d7b-e17f1840928a",
+      "status": "pass",
+      "finishedAt": "2026-07-09T12:33:47.630315Z",
+      "artifactsDir": ".fozzy/runs/956f7977-e93d-47f4-9d7b-e17f1840928a"
+    },
+    {
+      "runId": "178cf8db-b54b-47dd-b7fa-434da6ebfa70",
+      "status": "pass",
+      "finishedAt": "2026-07-09T12:33:43.175277Z",
+      "artifactsDir": ".fozzy/runs/178cf8db-b54b-47dd-b7fa-434da6ebfa70"
+    },
+    {
+      "runId": "1333cebe-7935-4c4d-8350-9f9822c21861",
+      "status": "pass",
+      "finishedAt": "2026-07-09T12:33:43.170877Z",
+      "artifactsDir": ".fozzy/runs/1333cebe-7935-4c4d-8350-9f9822c21861"
+    },
+    {
+      "runId": "5de4c3e8-9a0b-44f2-ac0b-5bfdb82c571a",
+      "status": "pass",
+      "finishedAt": "2026-07-09T12:33:38.486887Z",
+      "artifactsDir": ".fozzy/runs/5de4c3e8-9a0b-44f2-ac0b-5bfdb82c571a"
+    },
+    {
+      "runId": "b9bc16cb-f2fc-4c45-8387-34505518344e",
+      "status": "pass",
+      "finishedAt": "2026-07-09T12:33:38.480624Z",
+      "artifactsDir": ".fozzy/runs/b9bc16cb-f2fc-4c45-8387-34505518344e"
+    },
+    {
+      "runId": "36c18f91-c409-4485-a5d4-64e9c8de4c7b",
+      "status": "pass",
+      "finishedAt": "2026-07-05T13:36:15.93292Z",
+      "artifactsDir": ".fozzy/runs/36c18f91-c409-4485-a5d4-64e9c8de4c7b"
+    },
+    {
+      "runId": "02f7951f-ac64-4711-9b89-181a284c9092",
+      "status": "pass",
+      "finishedAt": "2026-07-05T13:36:15.902612Z",
+      "artifactsDir": ".fozzy/runs/02f7951f-ac64-4711-9b89-181a284c9092"
+    },
+    {
+      "runId": "3065d464-2711-4277-98a0-4b03808379d2",
+      "status": "pass",
+      "finishedAt": "2026-07-05T13:36:09.422922Z",
+      "artifactsDir": ".fozzy/runs/3065d464-2711-4277-98a0-4b03808379d2"
+    },
+    {
+      "runId": "9266d64e-584c-49af-b703-8dea9f68e0ff",
+      "status": "pass",
+      "finishedAt": "2026-07-05T13:36:08.008905Z",
+      "artifactsDir": ".fozzy/runs/9266d64e-584c-49af-b703-8dea9f68e0ff"
+    },
+    {
+      "runId": "08650b8a-b7a7-4bfd-8d0e-bd349724ee89",
+      "status": "fail",
+      "finishedAt": "2026-07-05T13:35:52.6894Z",
+      "artifactsDir": ".fozzy/runs/08650b8a-b7a7-4bfd-8d0e-bd349724ee89"
+    },
+    {
+      "runId": "2d0fb248-2422-47eb-80b7-058265febd63",
+      "status": "fail",
+      "finishedAt": "2026-07-05T13:35:41.004516Z",
+      "artifactsDir": ".fozzy/runs/2d0fb248-2422-47eb-80b7-058265febd63"
+    },
+    {
+      "runId": "9366a7d8-3b49-49b4-9afe-6eda9db0ea62",
+      "status": "pass",
+      "finishedAt": "2026-07-05T13:35:41.003728Z",
+      "artifactsDir": ".fozzy/runs/9366a7d8-3b49-49b4-9afe-6eda9db0ea62"
+    }
+  ]
+}
